@@ -1,33 +1,32 @@
-import os.path
-import re
+import os
 import sys
-
-# TODO: After update file, reload service
-
-
-def disable(file_path: str):
-    data = read_all_text(file_path)
-    data = re.sub("nameserver [0-9.]*", "", data).strip()
-    write_all_text(file_path, data)
+import re
 
 
-def enable(file_path: str):
-    disable(file_path)
-    data = read_all_text(file_path)
-    data += "\nnameserver 185.51.200.2\nnameserver 178.22.122.100\n"
-    write_all_text(file_path, data)
+def disable():
+    connection_name = get_active_connection_name()
+    os.system(f"nmcli connection modify \"{connection_name}\" ipv4.dns \"\"")
+    os.system(f"nmcli connection modify \"{connection_name}\" ipv4.ignore-auto-dns no")
+    os.system(f"nmcli connection modify \"{connection_name}\" ipv6.method auto")
+    restart_connection(connection_name)
 
 
-def read_all_text(file_path: str) -> str:
-    if not os.path.isfile(file_path):
-        return ""
-    file = open(file_path, "r")
-    return file.read()
+def enable():
+    connection_name = get_active_connection_name()
+    os.system(f"nmcli connection modify \"{connection_name}\" ipv4.dns \"185.51.200.2, 178.22.122.100\"")
+    os.system(f"nmcli connection modify \"{connection_name}\" ipv4.ignore-auto-dns yes")
+    os.system(f"nmcli connection modify \"{connection_name}\" ipv6.method disabled")
+    restart_connection(connection_name)
 
 
-def write_all_text(file_path: str, data: str):
-    file = open(file_path, "w")
-    file.write(data)
+def get_active_connection_name() -> str:
+    data = os.popen("nmcli con show --active | grep wifi").read()
+    return re.split("[ \t]{2,}", data)[0]  # Split base 2 or more white space
+
+
+def restart_connection(connection_name: str):
+    os.system(f"nmcli con down \"{connection_name}\"")
+    os.system(f"nmcli con up \"{connection_name}\"")
 
 
 def main():
@@ -39,13 +38,12 @@ def main():
         sys.exit(1)
 
     command = sys.argv[1].lower()
-    file_path = "/etc/resolvconf/resolv.conf.d/base-test"  # TODO: Remove test from file name
     if command == "disable":
-        disable(file_path)
+        disable()
     elif command == "enable":
-        enable(file_path)
+        enable()
     else:
-        print("Command is not valid. Use enable or disable command.")
+        print("Command is not valid. Use 'enable' or 'disable' command.")
         sys.exit(1)
 
 
