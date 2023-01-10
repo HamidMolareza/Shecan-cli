@@ -2,6 +2,8 @@
 
 An unofficial Ubuntu CLI for easy use of [Shecan](https://shecan.ir/) DNS.
 
+> This program is in **alpha** version.
+
 ## Usage
 
 1. Clone project to specific dir
