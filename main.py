@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
+
 from libs.ColorPrint import ColorPrint
 from libs.Shecan import Shecan
+
 
 # TODO: Use command line library
 

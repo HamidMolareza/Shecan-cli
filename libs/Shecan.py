@@ -3,7 +3,7 @@ from libs.Nmcli import Nmcli
 
 
 class Shecan:
-    _shecan_dns_list = ["185.51.200.2", "178.22.122.100"]
+    _shecan_dns_list = ["10.202.10.202", "10.202.10.102"]
 
     @staticmethod
     def disable():
